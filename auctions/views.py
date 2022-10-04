@@ -4,15 +4,15 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .models import *
 
 
 def index(request):
 
     #dodji to podataka iz baze i izbaci ih u neku listu ili tkao i onda ih prebaci samo u index html ( mozda bootstrap da izgldea lijepse)
-
-
-    return render(request, "auctions/index.html")
+    return render(request, "auctions/index.html", {
+        "listings": Listing.objects.all()
+    })
 
 
 def login_view(request):
@@ -71,3 +71,10 @@ def watchlist(request):
     pass
 
 
+
+def create_listing(request):
+    
+    if request.method == "POST":
+        pass
+    else:
+        return render(request, "auctions/create.html")

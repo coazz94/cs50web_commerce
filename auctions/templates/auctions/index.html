@@ -1,11 +1,30 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
+
     <h2>Active Listings</h2>
 
-    
+    <div class="row">
 
-
-
-
+        {% for listing in listings %}
+            <div class="col-lg-2 d-flex align-items-stretch" >
+                <div class="card mb-2 shadow-sm" >
+                <div class="card-header">
+                    {{ listing.name }}
+                  </div>
+                <img class="card-img-top" src="static/images/{{ listing.image }}" alt="Auction item">
+              <div class="card-body">
+                <p class="card-text">{{ listing.description }}</p>
+                <div class="d-flex justify-content-between align-self-end">
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-outline-secondary">Bid</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary">Add to Watchlist</button>
+                  </div>
+                  <p class="card-text" >{{ listing.price }} $</p>
+                </div>
+              </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}
