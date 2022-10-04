@@ -8,6 +8,10 @@ from .models import User
 
 
 def index(request):
+
+    #dodji to podataka iz baze i izbaci ih u neku listu ili tkao i onda ih prebaci samo u index html ( mozda bootstrap da izgldea lijepse)
+
+
     return render(request, "auctions/index.html")
 
 
@@ -61,3 +65,9 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+
+def watchlist(request):
+    pass
+
+
