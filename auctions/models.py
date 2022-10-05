@@ -5,7 +5,6 @@ from django.db import models
 class User(AbstractUser):
     pass
 
-
 class Listing(models.Model):
     name = models.CharField(max_length=64)
     description = models.TextField(max_length=500)
@@ -16,4 +15,4 @@ class Listing(models.Model):
     def __str__(self):
        return f"{self.name} costs {self.price}"
 
-#upload_to="auctions/static/images"
+

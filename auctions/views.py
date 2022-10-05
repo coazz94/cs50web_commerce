@@ -67,8 +67,11 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
-def watchlist(request):
-    pass
+def watchlist(request):   
+    if request.method == "POST":
+        pass
+    else:
+        return render(request, "auctions/watchlist.html")
 
 
 
