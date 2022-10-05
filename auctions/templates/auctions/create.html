@@ -2,20 +2,13 @@
 
 {% block body %}
 
-    <h2>Test</h2>
+    <h2>Create a new Listing</h2>
 
-
-    <!--
-
-        make a form here and post all info needed for the model 
-        info needed :
-            name
-            description
-            image
-            url
-            price 
-
-    -->
+    <form action ="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Submit">
+    </form>
 
 
 {% endblock %}

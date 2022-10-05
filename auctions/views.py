@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .models import *
+from . import forms
 
 
 def index(request):
@@ -78,6 +79,26 @@ def watchlist(request):
 def create_listing(request):
     
     if request.method == "POST":
-        pass
+        form_data = forms.CreateListing(request.POST)
+
+        if form_data.is_valid():
+
+
+            title = form_data.cleaned_data["title"]
+            description = form_data.cleaned_data["description"]
+            price = form_data.cleaned_data["price"]
+            url = form_data.cleaned_data["url"]
+            
+            listing = Listing(name=title, description=description, price=price, url=url)
+            listing.save()
+
+        
+        #else:
+        return render(request, "auctions/create.html", {
+            "form" : forms.CreateListing()
+        })
+
     else:
-        return render(request, "auctions/create.html")
+        return render(request, "auctions/create.html", {
+            "form" : forms.CreateListing()
+        })
