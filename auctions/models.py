@@ -1,18 +1,21 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from .forms import CATEGORIES
 
 class User(AbstractUser):
+    id = models.AutoField(primary_key=True)
     pass
 
 class Listing(models.Model):
-    name = models.CharField(max_length=64)
+    id = models.AutoField(primary_key = True)
+    title = models.CharField(max_length=64)
     description = models.TextField(max_length=500)
     image = models.ImageField(null=True, blank=True)
-    url = models.URLField(max_length=200)
     price = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    category = models.CharField(max_length=15, default="not_defined", choices=CATEGORIES)
 
     def __str__(self):
-       return f"{self.name} costs {self.price}"
+       return f"{self.title} costs {self.price}"
 
 

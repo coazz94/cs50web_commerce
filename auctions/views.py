@@ -9,14 +9,19 @@ from . import forms
 
 
 def index(request):
-
-    #dodji to podataka iz baze i izbaci ih u neku listu ili tkao i onda ih prebaci samo u index html ( mozda bootstrap da izgldea lijepse)
+    """
+        Just the index page that is showing or the listings aviable
+    """
     return render(request, "auctions/index.html", {
         "listings": Listing.objects.all()
     })
 
 
 def login_view(request):
+    """
+        If Get return Login Page
+        If Post see if user exists / log him in / redirect to index Page
+    """
     if request.method == "POST":
 
         # Attempt to sign user in
@@ -68,37 +73,72 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
-def watchlist(request):   
+def watchlist(request):
     if request.method == "POST":
         pass
     else:
         return render(request, "auctions/watchlist.html")
 
 
-
 def create_listing(request):
-    
+    """
+        If Post, get the data from the form and put it in the DB via the Model Listing
+        IF error with data return Error Page
+    """
+
     if request.method == "POST":
-        form_data = forms.CreateListing(request.POST)
+        form_data = forms.CreateListing(request.POST or None, request.FILES or None)
 
         if form_data.is_valid():
-
 
             title = form_data.cleaned_data["title"]
             description = form_data.cleaned_data["description"]
             price = form_data.cleaned_data["price"]
-            url = form_data.cleaned_data["url"]
-            
-            listing = Listing(name=title, description=description, price=price, url=url)
+            img = form_data.cleaned_data["image"]
+            category = form_data.cleaned_data["category"]
+
+            listing = Listing(title=title, description=description, price=price, image=img, category=category)
             listing.save()
 
-        
-        #else:
-        return render(request, "auctions/create.html", {
-            "form" : forms.CreateListing()
-        })
+        else:
+            return render(request, "auctions/error.html", {
+                "message": "Ups something went wrong with creating your listing, please try again"
+            })
 
     else:
         return render(request, "auctions/create.html", {
-            "form" : forms.CreateListing()
+            "form": forms.CreateListing()
         })
+
+
+def listing(request):
+
+    id = request.GET["subjectID"]
+
+    if request.method == "POST":
+        pass
+
+        """
+            Watchlist hinzufügen muss also ein template machen unten bei else 
+            Button = add to watch list = soll in ein neues Model adden 
+            Button Bid = check das der Preis größer ist, wenn nicht zeige text an mit django if
+            wenn schon aktualisieren den Bid auch ein model 
+            
+            speichere irgednwo auch welcher user welches bid gemacht hat und schaue ob der user dieses Bid gemacht hat 
+            wenn ja kann er es dekativeiren 
+            wenn nein dann nicht ( jinja if )
+        
+            im auction model noch eine zeile mit id from user der das geamcht hat ? 
+            user id dann auch vergeben ! und linken 
+            
+        """
+
+    else:
+        try:
+            return render(request, "auctions/listing.html", {
+                "listing": Listing.objects.get(id=id)
+            })
+        except:
+            return render(request, "auctions/error.html", {
+                "message": "This item dosent exist"
+            })
