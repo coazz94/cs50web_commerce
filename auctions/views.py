@@ -73,13 +73,17 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
+
+
 def watchlist(request, user_id):
 
-    info = User.objects.get(id=user_id)
+    info = Listing.objects.get(id=user_id)
+
+    print("wwwwwwwwwwwwwwwwwwww",info)
 
     return render(request, "auctions/watchlist.html",{
 
-        "user_items": info.listing.all()
+        #"user_items": info.listing.all()
     })
 
 
