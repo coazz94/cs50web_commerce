@@ -4,7 +4,42 @@
 
 {% block body %}
 
+<section class="py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="row gx-4 gx-lg-5 align-items-center">
+            <div class="col-md-6"><img class="card-img-top mb-5 mb-md-0" src="static/images/{{ listing.image }}" alt="Auction item" onerror="this.src='static/images/noimg.png';"></div>
+            <div class="col-md-6">
+                <h1 class="display-5 fw-bolder">{{ listing.title }}</h1>
+                <div class="fs-5 mb-5">
+                    <h4>$ {{ listing.price }}</h4>
+                <p class="lead">{{ listing.description }}</p>
+                <div class="d-flex">
 
-    <h2>{{ listing.title }}</h2>
+
+                    <form>
+                        {% csrf_token %}
+                        <input class="form-control text-center me-10" id="price"  placeholder="0.00" type="num" name="price" style="max-width: 4rem;margin-bottom: 5px;">
+                        <button class="btn btn-outline-dark flex-shrink-10" type="button" style="width:4em;">
+                            <i class="bi-cart-fill me-1"></i>
+                            Bid
+                        </button>
+                    </form>
+                   
+
+
+                    <form action="{% url 'add_watchl' listing.id %}" method="post">
+                        {% csrf_token %}
+                        <input class="btn btn-outline-dark flex-shrink-10" type="submit" name="add" value="Add to watchlist" style="width:10em; margin-left:100px;margin-top: 45px;">
+                            <i class="bi-cart-fill me-1"></i>
+                        </input>
+                    </form>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 {% endblock %}

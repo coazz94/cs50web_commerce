@@ -19,3 +19,20 @@ class Listing(models.Model):
        return f"{self.title} costs {self.price}"
 
 
+
+class Watchlist(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
+    items = models.ManyToManyField(Listing, blank=True, related_name="listing")
+
+
+    def __str__(self):
+        return f"{self.user}"
+
+
+
+"""
+
+    Welcher User hat das Listing ertsellt Wie
+    Bieten auf den Artikel ( price tag bei model from listing ka wie)
+
+"""

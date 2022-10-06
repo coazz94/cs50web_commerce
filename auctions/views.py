@@ -1,3 +1,4 @@
+from pickle import NONE
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
@@ -72,12 +73,14 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
+def watchlist(request, user_id):
 
-def watchlist(request):
-    if request.method == "POST":
-        pass
-    else:
-        return render(request, "auctions/watchlist.html")
+    info = User.objects.get(id=user_id)
+
+    return render(request, "auctions/watchlist.html",{
+
+        "user_items": info.listing.all()
+    })
 
 
 def create_listing(request):
@@ -115,30 +118,26 @@ def listing(request):
 
     id = request.GET["subjectID"]
 
-    if request.method == "POST":
-        pass
 
-        """
-            Watchlist hinzufügen muss also ein template machen unten bei else 
-            Button = add to watch list = soll in ein neues Model adden 
-            Button Bid = check das der Preis größer ist, wenn nicht zeige text an mit django if
-            wenn schon aktualisieren den Bid auch ein model 
-            
-            speichere irgednwo auch welcher user welches bid gemacht hat und schaue ob der user dieses Bid gemacht hat 
-            wenn ja kann er es dekativeiren 
-            wenn nein dann nicht ( jinja if )
-        
-            im auction model noch eine zeile mit id from user der das geamcht hat ? 
-            user id dann auch vergeben ! und linken 
-            
-        """
+    try:
+        return render(request, "auctions/listing.html", {
+            "listing": Listing.objects.get(id=id)
+        })
+    except:
+        return render(request, "auctions/error.html", {
+            "message": "This item dosent exist"
+        })
 
-    else:
-        try:
-            return render(request, "auctions/listing.html", {
-                "listing": Listing.objects.get(id=id)
-            })
-        except:
-            return render(request, "auctions/error.html", {
-                "message": "This item dosent exist"
-            })
+
+
+def add_watchl(request, listing_id):
+    
+    item = Listing.objects.get(id=listing_id)
+
+    """
+        Add hier einfach zum Listing
+    """
+
+    print(item.title)
+
+    

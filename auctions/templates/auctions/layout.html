@@ -8,39 +8,43 @@
         <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
     </head>
     <body>
-        <h1>Auctions</h1>
-        <div>
+        <h1 class="container text-center">Auctions</h1>
+        <div >
             {% if user.is_authenticated %}
-                Signed in as <strong>{{ user.username }}</strong>.
+                Signed in as <strong >{{ user.username }}</strong>.
             {% else %}
                 Not signed in.
             {% endif %}
         </div>
-        <ul class="nav">
+            <nav class="navbar navbar-dark bg-dark">
+            <ul class="nav ">
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
+                <a class="navbar-brand" href="{% url 'index' %}">Active Listings</a>
             </li>
             {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                    <a class="navbar-brand" href="{% url 'logout' %}">Log Out</a>
                 </li>
                 <li class="nav_item">
-                    <a class="nav-link" href="{% url 'watchlist' %}">Watchlist</a>
+                    <a class="navbar-brand" href="{% url 'watchlist' user.id%}">Watchlist</a>
                 </li>
                 <li class="nav_item">
-                    <a class="nav-link" href="{% url 'create_listing' %}">Create Listing</a>
+                    <a class="navbar-brand" href="{% url 'create_listing' %}">Create Listing</a>
                 </li>
             {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                    <a class="navbar-brand" href="{% url 'login' %}">Log In</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    <a class="navbar-brand" href="{% url 'register' %}">Register</a>
                 </li>
             {% endif %}
-        </ul>
+            </ul>
+            </nav>
         <hr>
         {% block body %}
         {% endblock %}
     </body>
 </html>
+
+
