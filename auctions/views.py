@@ -1,3 +1,4 @@
+from ast import arg
 from pickle import NONE
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
@@ -5,6 +6,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+
+
 
 from .models import *
 from . import forms
@@ -123,10 +126,10 @@ def create_listing(request):
         })
 
 
-def listing(request, subjectID=None):
+def listing(request, listing_id):
 
     on_watchlist = True
-    item = Listing.objects.get(id=request.GET["subjectID"])
+    item = Listing.objects.get(id=listing_id)
     watchlist = Watchlist.objects.filter(user=request.user.id)
 
 
@@ -160,11 +163,11 @@ def add_watchl(request, listing_id):
     watchlist.save()
    
 
-    return HttpResponseRedirect(reverse("index"))
+    return HttpResponseRedirect(reverse('listing', args=[listing_id]))
     
 
 def remove_watchl(request, listing_id):
     
     Watchlist.objects.filter(user=request.user.id, listing=listing_id).delete()
     
-    return HttpResponseRedirect(reverse("index")) # hier auf lisiting zuruck problem ist aber das ich nicht die id from artikel schicken kann
+    return HttpResponseRedirect(reverse('listing', args=[listing_id]))
