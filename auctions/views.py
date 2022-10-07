@@ -4,6 +4,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 from .models import *
 from . import forms
@@ -74,19 +75,22 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
+@login_required
+def watchlist(request):
 
-def watchlist(request, user_id):
-
-    info = Listing.objects.get(id=user_id)
-
-    print("wwwwwwwwwwwwwwwwwwww",info)
+    watchlist = Watchlist.objects.filter(user=request.user.id)
 
     return render(request, "auctions/watchlist.html",{
 
-        #"user_items": info.listing.all()
+        "watchlist": watchlist
     })
 
 
+
+
+
+
+@login_required
 def create_listing(request):
     """
         If Post, get the data from the form and put it in the DB via the Model Listing
@@ -133,15 +137,27 @@ def listing(request):
         })
 
 
-
+@login_required
 def add_watchl(request, listing_id):
     
-    item = Listing.objects.get(id=listing_id)
+    
+
+    watchlist = Watchlist()
+
+
+
+    watchlist.user = User.objects.get(id = request.user.id)
+    watchlist.listing = Listing.objects.get(id = listing_id)
+
+    watchlist.save()
+   
+
+    return HttpResponseRedirect(reverse("index"))
 
     """
         Add hier einfach zum Listing
     """
 
-    print(item.title)
+    
 
     

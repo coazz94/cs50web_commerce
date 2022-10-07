@@ -4,7 +4,6 @@ from django.db import models
 from .forms import CATEGORIES
 
 class User(AbstractUser):
-    id = models.AutoField(primary_key=True)
     pass
 
 class Listing(models.Model):
@@ -21,12 +20,11 @@ class Listing(models.Model):
 
 
 class Watchlist(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
-    items = models.ManyToManyField(Listing, blank=True, related_name="listing")
-
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="watchlist")
+    listing = models.ForeignKey(Listing, blank=True,  on_delete=models.CASCADE, related_name="listings")
 
     def __str__(self):
-        return f"{self.user}"
+        return f"{self.user.username} listed {self.listing.title}"
 
 
 
@@ -34,5 +32,31 @@ class Watchlist(models.Model):
 
     Welcher User hat das Listing ertsellt Wie
     Bieten auf den Artikel ( price tag bei model from listing ka wie)
+
+"""
+
+"""
+class Company(models.Model):
+    name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
+    
+
+    
+class Language(models.Model):
+    name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
+
+
+class Programmer(models.Model):
+    name = models.CharField(max_length=20)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    language = models.ManyToManyField(Language)
+
+    def __str__(self):
+        return self.name
 
 """

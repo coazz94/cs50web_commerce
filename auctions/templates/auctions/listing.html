@@ -27,7 +27,7 @@
                    
 
 
-                    <form action="{% url 'add_watchl' user.id %}" method="post">
+                    <form action="{% url 'add_watchl' listing.id %}" method="post">
                         {% csrf_token %}
                         <input class="btn btn-outline-dark flex-shrink-10" type="submit" name="add" value="Add to watchlist" style="width:10em; margin-left:100px;margin-top: 45px;">
                             <i class="bi-cart-fill me-1"></i>
