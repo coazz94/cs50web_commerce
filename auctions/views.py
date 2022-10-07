@@ -80,6 +80,7 @@ def watchlist(request):
 
     watchlist = Watchlist.objects.filter(user=request.user.id)
 
+
     return render(request, "auctions/watchlist.html",{
 
         "watchlist": watchlist
@@ -122,14 +123,21 @@ def create_listing(request):
         })
 
 
-def listing(request):
+def listing(request, subjectID=None):
 
-    id = request.GET["subjectID"]
+    on_watchlist = True
+    item = Listing.objects.get(id=request.GET["subjectID"])
+    watchlist = Watchlist.objects.filter(user=request.user.id)
 
+
+    for x in watchlist:
+        if item.title == x.listing.title:
+            on_watchlist = False
 
     try:
         return render(request, "auctions/listing.html", {
-            "listing": Listing.objects.get(id=id)
+            "listing": item,
+            "watchlist" : on_watchlist
         })
     except:
         return render(request, "auctions/error.html", {
@@ -153,11 +161,10 @@ def add_watchl(request, listing_id):
    
 
     return HttpResponseRedirect(reverse("index"))
-
-    """
-        Add hier einfach zum Listing
-    """
-
     
 
+def remove_watchl(request, listing_id):
     
+    Watchlist.objects.filter(user=request.user.id, listing=listing_id).delete()
+    
+    return HttpResponseRedirect(reverse("index")) # hier auf lisiting zuruck problem ist aber das ich nicht die id from artikel schicken kann
