@@ -4,7 +4,7 @@
 
 {% block body %}
 
-<section class="py-5">
+    <section class="py-5">
     <div class="container px-4 px-lg-5 my-5">
         <div class="row gx-4 gx-lg-5 align-items-center">
             <div class="col-md-6"><img class="card-img-top mb-5 mb-md-0" src="{{ listing.image.url }}" alt="Auction item" onerror="this.src='/static/images/noimg.png'"></div>
@@ -13,7 +13,9 @@
                 <div class="fs-5 mb-5">
                     <h5 style="margin-top:20px; margin-bottom:20px">Starting Price was: $ {{ listing.price }}</h5>
                 <p class="lead">{{ listing.description }}</p>
-                <div>
+
+                {% if listing.active %}
+                    <div>
                     <h5 style="margin-top:20px; margin-bottom:20px">Highest Bid:  $ {{ highest_bid.bid_price }}</h5>
                     <h5 style="margin-top:20px; margin-bottom:20px">Bids total: {{ bid_count }} </h5>
                     {% if creator %}
@@ -24,13 +26,8 @@
                             </input>
                         </form>
                     {% endif %}
-                </div>
-                <div style="margin-top: 50px;" class="d-flex">
-
-
-
-
-
+                    </div>
+                    <div style="margin-top: 50px;" class="d-flex">
                     {% if request.user.is_authenticated %}
                         <form action="{% url 'make_bid' %}" method="post">
                             {% csrf_token %}
@@ -39,7 +36,7 @@
                                 <i class="bi-cart-fill me-1"></i>
                             </input>
                         </form>
-                        {% if watchlist %}
+                        {% if watchlist != True %}
                             <form action="{% url 'add_watchl' %}" method="post">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-outline-dark flex-shrink-10" id="add" name ="add" value="{{ listing.id }}" style="width:10rem; margin-left:100px; margin-top: 60px;">Add to watchlist</button>
@@ -55,11 +52,82 @@
                             </form>
                         {% endif %}
                     {% endif %}
-                </div>
+                    </div>
+                {% endif %}
+                
+                {% if listing.winner %}
+                    <div class="fs-5 mb-5">
+                        <h5 style="margin-top:20px; margin-bottom:20px">This auction has finished</h5>
+                        <h5 style="margin-top:20px; margin-bottom:20px">The winner is: {{ listing.winner }}</h5>
+                    </div>
+                {% endif %}
                 
             </div>
         </div>
     </div>
-</section>
+    </section>
+    <section class="py-5">
+        <div class="container my-5 py-5">
+          <div class="row d-flex justify-content-center">
+            <div class="col-md-12 col-lg-10 col-xl-8">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex flex-start align-items-center">
+                    <div>
 
+
+
+
+                      <h6 class="fw-bold text-primary mb-1">Lily Coleman</h6> 
+                      <p class="text-muted small mb-0">
+                        Shared publicly - Jan 2020
+                      </p>
+
+
+
+
+
+                    </div>
+                  </div>
+      
+                  <p class="mt-3 mb-4 pb-2">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                    quis nostrud exercitation ullamco laboris nisi ut aliquip consequat.
+                  </p>
+      
+
+                </div>
+
+
+
+                <div class="card-footer py-3 border-0" style="background-color: #f8f9fa;">
+                  <div class="d-flex flex-start w-100">
+                    <div class="form-outline w-100">
+
+
+                      <textarea class="form-control" id="textAreaExample" rows="4"
+                        style="background: #fff;"></textarea>
+
+
+
+                      <label class="form-label" for="textAreaExample">Message</label>
+                    </div>
+                  </div>
+
+
+
+                  <div class="float-end mt-2 pt-1">
+                    <button type="button" class="btn btn-primary btn-sm">Post comment</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">Cancel</button>
+                  </div>
+
+
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </section>
 {% endblock %}

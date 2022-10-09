@@ -10,17 +10,20 @@
     <body>
         <h1 class="container text-center">Auctions</h1>
         <div >
+
             {% if user.is_authenticated %}
                 Signed in as <strong >{{ user.username }}</strong>.
             {% else %}
                 Not signed in.
             {% endif %}
+
         </div>
             <nav class="navbar navbar-dark bg-dark">
             <ul class="nav ">
             <li class="nav-item">
                 <a class="navbar-brand" href="{% url 'index' %}">Active Listings</a>
             </li>
+
             {% if user.is_authenticated %}
                 <li class="nav-item">
                     <a class="navbar-brand" href="{% url 'logout' %}">Log Out</a>
@@ -39,11 +42,13 @@
                     <a class="navbar-brand" href="{% url 'register' %}">Register</a>
                 </li>
             {% endif %}
+
             </ul>
             </nav>
         <hr>
         {% block body %}
         {% endblock %}
+        
     </body>
 </html>
 

@@ -21,7 +21,7 @@ def index(request):
         Just the index page that is showing or the listings aviable
     """
     return render(request, "auctions/index.html", {
-        "listings": Listing.objects.filter(active=True)
+        "listings": Listing.objects.filter()
     })
 
 
@@ -55,6 +55,7 @@ def logout_view(request):
 
 
 def register(request):
+
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
@@ -81,20 +82,63 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
+def listing(request, listing_id):
+
+    """
+        try:
+            display the listing page with all the needed paramters
+        except:
+            return an error Page
+    """
+
+    try:
+        # get the item and the watchlist of the user
+        item = Listing.objects.get(id=listing_id)
+        watchlist = Watchlist.objects.filter(user=request.user.id)
+
+        # get the bid count and highest_bid of the listing
+        bid_count =  Bid.objects.filter(listing=listing_id).count()
+        highest_bid = Bid.objects.filter(listing=listing_id).order_by("-bid_price").first()
+
+        # check if the item is already on the watchlist
+        for items in watchlist:
+            if item.title == items.listing.title:
+                on_watchlist = True
+            else:
+                on_watchlist = False
+
+        # check if the user has created the listing (to gain acces to end_auction)
+        if item.created_by.username == request.user.username:
+            creator = True
+        else:
+            creator = False
+
+        # render the Page with the infos
+        return render(request, "auctions/listing.html", {
+            "listing": item,
+            "watchlist" : on_watchlist, 
+            "bid_count" : bid_count, 
+            "highest_bid" : highest_bid,
+            "creator" : creator,
+        })
+
+    except:
+        return render(request, "auctions/error.html", {
+            "message": "This item dosent exist"
+        })
+        
+
 @login_required
 def watchlist(request):
+    """
+        1. Render a Watchlistpage that shows the Users watchlist
+    """
 
     watchlist = Watchlist.objects.filter(user=request.user.id)
 
-
     return render(request, "auctions/watchlist.html",{
-
-        "watchlist": watchlist
+        "watchlist": watchlist,
     })
-
-
-
-
 
 
 @login_required
@@ -105,129 +149,141 @@ def create_listing(request):
     """
 
     if request.method == "POST":
+
+        # get the form data
         form_data = forms.CreateListing(request.POST or None, request.FILES or None)
 
+        # if the data is valid than proceed
         if form_data.is_valid():
 
             title = form_data.cleaned_data["title"]
             description = form_data.cleaned_data["description"]
             price = form_data.cleaned_data["price"]
             img = form_data.cleaned_data["image"]
-            print(img)
             category = form_data.cleaned_data["category"]
 
+            # make a new Listing object, with the parameters from above
             listing = Listing(title=title, description=description, price=price, image=img, category=category, active=True, created_by=User.objects.get(id=request.user.id))
             listing.save()
 
+            # return to the index Page
             return HttpResponseRedirect(reverse("index"))
 
         else:
+        
+            # Render an Error Page if the form was not valid
             return render(request, "auctions/error.html", {
                 "message": "Ups something went wrong with creating your listing, please try again"
             })
 
     else:
+        # if get than render the page for creating a listing
         return render(request, "auctions/create.html", {
             "form": forms.CreateListing()
         })
 
 
-def listing(request, listing_id):
-
-    on_watchlist = True
-    item = Listing.objects.get(id=listing_id)
-    watchlist = Watchlist.objects.filter(user=request.user.id)
-
-    bid_count =  Bid.objects.filter(listing=listing_id).count()
-    highest_bid = Bid.objects.filter(listing=listing_id).order_by("-bid_price").first()
-
-
-    for items in watchlist:
-        if item.title == items.listing.title:
-            on_watchlist = False
-
-    if item.created_by.username == request.user.username:
-        creator = True
-    else:
-        creator = False
-
-
-    return render(request, "auctions/listing.html", {
-        "listing": item,
-        "watchlist" : on_watchlist, 
-        "bid_count" : bid_count, 
-        "highest_bid" : highest_bid,
-        "creator" : creator
-
-    })
-
-
-
-
-    #später aktiveren
-    #try:
-    #    return render(request, "auctions/listing.html", {
-    #        "listing": item,
-    #        "watchlist" : on_watchlist
-    #    })
-    #except:
-    #    return render(request, "auctions/error.html", {
-    #        "message": "This item dosent exist"
-    #    })
-
-
 @login_required
 def add_watchl(request):
-    
+    """
+        add a listing to the users watchlist
+    """
+
+    # get the listing id from the Post form
     listing_id = request.POST.get("add")
 
+    # new instance of the watchlist, and add the user and the listing to it
     watchlist = Watchlist()
     watchlist.user = User.objects.get(id = request.user.id)
     watchlist.listing = Listing.objects.get(id = listing_id)
     watchlist.save()
-   
+
+    # refresh the listing Page
     return HttpResponseRedirect(reverse('listing', args=[listing_id]))
     
+
 @login_required
 def remove_watchl(request):
+    """
+        remove item from the listing Page
+    """
 
+    # get the listing via the id proviedes by the form 
     listing_id = request.POST.get("remove")
     
+    # filter the listing via the id and the user from the watchlist
     Watchlist.objects.filter(user=request.user.id, listing=listing_id).delete()
     
-    return HttpResponseRedirect(reverse('listing', kwargs=[listing_id]))
+    # refresh the listin page again
+    return HttpResponseRedirect(reverse('listing', kwargs={"listing_id":listing_id}))
 
 
 @login_required
 def make_bid(request):
+
+    """
+        a function to make the bid for the item
+        we have to check some dependecies and than be able to save the bid
+    """
     
-    try:
+    if request.POST["bid_price"] and request.POST.get("make_bid"):
+
+        # get the bid price provided and the listing
         bid_price= float(request.POST["bid_price"])
         listing_id = request.POST.get("make_bid")
+
+        # get the starting price and the highest bid ever
         starting_price = float(Listing.objects.get(id = listing_id).price)      
         highest_bid = Bid.objects.filter(listing=listing_id).order_by("-bid_price").first()     
 
+        # check if a bid was ever made, when not than ste the price to 0 else set it to the higest bid price ever made
         if not highest_bid:
             highest_bid = 0
         else:
             highest_bid = highest_bid.bid_price   
 
-        if bid_price < highest_bid or bid_price < starting_price:
-            raise ValueError
-        else:
+        # if the bid price is bigger than the startingprice/ highest bid 
+        if bid_price > highest_bid or bid_price > starting_price:
+
+            # save the bid
             listing = Listing.objects.get(id = listing_id)
             user = User.objects.get(id = request.user.id)
-            bid = Bid(listing=listing,user= user , bid_price = bid_price)
+            bid = Bid(listing = listing,user = user , bid_price = bid_price)
             bid.save()
 
+        else:
+            return render(request, "auctions/error.html", {
+                "message": "Ups something went wrong with your bid, make sure that your bid is higher than the current one and the starting price" })
+
+
+        # return the listing Page
         return HttpResponseRedirect(reverse('listing', kwargs={"listing_id":listing_id}))       
 
-    except:
-           return render(request, "auctions/error.html", {
-             "message": "Ups something went wrong with your bid, make sure that your bid is higher than the current one and the starting price" })
-         
+    else:
+
+        # if something went wrong with the post arguments return a error Page
+        return render(request, "auctions/error.html", {
+          "message": "Ups something went wrong with your bid, make sure that your bid is higher than the current one and the starting price" })
 
 
+@login_required 
+def end_auction(request):
+    """
+        end the auction if the user is logged in who made the article
+    """
     
-def end_auction():
-    pass
+    # get the listingid provideds from the post form
+    listing_id = request.POST["end_auction"]
+
+    # get the highest bid ever
+    highest_bid = Bid.objects.filter(listing=listing_id).order_by("-bid_price").first()
+
+    # update the listing ( change status to not active, and provide info about the winner of the auction)
+    listing = Listing.objects.filter(id=listing_id)    
+    listing.update(active=False)
+    listing.update(winner=highest_bid.user)
+
+    # refresh the listing page
+    return HttpResponseRedirect(reverse('listing', kwargs={"listing_id":listing_id}))
+    
+

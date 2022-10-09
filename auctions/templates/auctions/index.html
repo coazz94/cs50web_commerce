@@ -6,8 +6,8 @@
 {% block body %}
 
     <h2>Active Listings</h2>
-
     <div class="row">
+
         {% for listing in listings %}
         <div class="col-lg-2 d-flex align-items-stretch" >
             <div class="card mb-2 shadow-sm" >
@@ -23,8 +23,7 @@
             </div>
         </div>
         {% endfor %}
+        
     </div>
 {% endblock %}
 
-
-<!--src="/static/images/{{ listing.image }}"-->

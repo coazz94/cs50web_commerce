@@ -25,7 +25,3 @@ class CreateListing(forms.Form):
     image = forms.ImageField(label="image", required=False)
 
     category = forms.ChoiceField(label="Category", required=True, choices=CATEGORIES)
-
-    # widget=forms.Textarea
-    # (attrs={"placeholder": "Category", "value": "Test",
-    #       "style": "margin-top:20px;height:2rem"}))

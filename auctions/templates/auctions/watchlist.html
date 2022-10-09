@@ -19,34 +19,38 @@
                               <th style="width:10%">Dummy</th>
                           </tr>
                       </thead>
+
                       {% for item in watchlist %}
-                        <tbody>
+                          <tbody>
                           <tr>
-                              <td data-th="Product">
-                                  <div class="row">
-                                      <div class="col-md-3 text-left">
-                                          <img src="static/images/{{ item.listing.image }}" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
-                                      </div>
-                                      <div class="col-md-9 text-left mt-sm-2">
-                                          <h4>{{ item.listing.title }}</h4>
-                                          <p class="font-weight-light">{{ item.listing.description }}</p>
-                                      </div>
-                                  </div>
-                              </td>
-                              <td data-th="Price">$ {{ item.listing.price }}</td>
-                              <td class="actions" data-th="Dummy">
-                                  <div class="text-right">
-                                    <p>Dummy</p>
-                                  </div>
-                              </td>
+                                <td data-th="Product">
+                                    <div class="row">
+                                        <div class="col-md-3 text-left">
+                                            <img src="{{ item.listing.image.url }}" alt="" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
+                                        </div>
+                                        <div class="col-md-9 text-left mt-sm-2">
+                                            <a class="nav" href="{% url 'listing'  item.listing.id  %}">
+                                                <h4>{{ item.listing.title }}</h4>
+                                            </a>
+                                            <p class="font-weight-light">{{ item.listing.description }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td data-th="Price">$ {{ item.listing.price }}</td>
+                                <td class="actions" data-th="Dummy">
+                                    <div class="text-right">
+                                      <p>Dummy</p>
+                                    </div>
+                                </td>
                           </tr>
-                        </tbody>
+                          </tbody>
                       {% endfor %}
+
                   </table>
                   </div>
               </div>
           </div>
       </section>
-
+      
 {% endblock %}
 
