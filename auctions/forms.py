@@ -12,7 +12,7 @@ CATEGORIES = [
 class CreateListing(forms.Form):
     title = forms.CharField(label="", required=True,
                             widget=forms.Textarea
-                            (attrs={"placeholder": "Title", "value": "Test", "style": "margin-top:20px;height:2rem"}))
+                            (attrs={"placeholder": "Title", "value": "Test", "style": "margin-top:20px;height:4rem;"}))
 
     description = forms.CharField(label="", required=True,
                                   widget=forms.Textarea

@@ -1,5 +1,8 @@
 from ast import arg
+from email import message
+from msilib.schema import Error
 from pickle import NONE
+from subprocess import list2cmdline
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
@@ -18,7 +21,7 @@ def index(request):
         Just the index page that is showing or the listings aviable
     """
     return render(request, "auctions/index.html", {
-        "listings": Listing.objects.all()
+        "listings": Listing.objects.filter(active=True)
     })
 
 
@@ -110,10 +113,13 @@ def create_listing(request):
             description = form_data.cleaned_data["description"]
             price = form_data.cleaned_data["price"]
             img = form_data.cleaned_data["image"]
+            print(img)
             category = form_data.cleaned_data["category"]
 
-            listing = Listing(title=title, description=description, price=price, image=img, category=category)
+            listing = Listing(title=title, description=description, price=price, image=img, category=category, active=True, created_by=User.objects.get(id=request.user.id))
             listing.save()
+
+            return HttpResponseRedirect(reverse("index"))
 
         else:
             return render(request, "auctions/error.html", {
@@ -132,42 +138,96 @@ def listing(request, listing_id):
     item = Listing.objects.get(id=listing_id)
     watchlist = Watchlist.objects.filter(user=request.user.id)
 
+    bid_count =  Bid.objects.filter(listing=listing_id).count()
+    highest_bid = Bid.objects.filter(listing=listing_id).order_by("-bid_price").first()
 
-    for x in watchlist:
-        if item.title == x.listing.title:
+
+    for items in watchlist:
+        if item.title == items.listing.title:
             on_watchlist = False
 
-    try:
-        return render(request, "auctions/listing.html", {
-            "listing": item,
-            "watchlist" : on_watchlist
-        })
-    except:
-        return render(request, "auctions/error.html", {
-            "message": "This item dosent exist"
-        })
+    if item.created_by.username == request.user.username:
+        creator = True
+    else:
+        creator = False
+
+
+    return render(request, "auctions/listing.html", {
+        "listing": item,
+        "watchlist" : on_watchlist, 
+        "bid_count" : bid_count, 
+        "highest_bid" : highest_bid,
+        "creator" : creator
+
+    })
+
+
+
+
+    #später aktiveren
+    #try:
+    #    return render(request, "auctions/listing.html", {
+    #        "listing": item,
+    #        "watchlist" : on_watchlist
+    #    })
+    #except:
+    #    return render(request, "auctions/error.html", {
+    #        "message": "This item dosent exist"
+    #    })
 
 
 @login_required
-def add_watchl(request, listing_id):
+def add_watchl(request):
     
-    
+    listing_id = request.POST.get("add")
 
     watchlist = Watchlist()
-
-
-
     watchlist.user = User.objects.get(id = request.user.id)
     watchlist.listing = Listing.objects.get(id = listing_id)
-
     watchlist.save()
    
-
     return HttpResponseRedirect(reverse('listing', args=[listing_id]))
     
+@login_required
+def remove_watchl(request):
 
-def remove_watchl(request, listing_id):
+    listing_id = request.POST.get("remove")
     
     Watchlist.objects.filter(user=request.user.id, listing=listing_id).delete()
     
-    return HttpResponseRedirect(reverse('listing', args=[listing_id]))
+    return HttpResponseRedirect(reverse('listing', kwargs=[listing_id]))
+
+
+@login_required
+def make_bid(request):
+    
+    try:
+        bid_price= float(request.POST["bid_price"])
+        listing_id = request.POST.get("make_bid")
+        starting_price = float(Listing.objects.get(id = listing_id).price)      
+        highest_bid = Bid.objects.filter(listing=listing_id).order_by("-bid_price").first()     
+
+        if not highest_bid:
+            highest_bid = 0
+        else:
+            highest_bid = highest_bid.bid_price   
+
+        if bid_price < highest_bid or bid_price < starting_price:
+            raise ValueError
+        else:
+            listing = Listing.objects.get(id = listing_id)
+            user = User.objects.get(id = request.user.id)
+            bid = Bid(listing=listing,user= user , bid_price = bid_price)
+            bid.save()
+
+        return HttpResponseRedirect(reverse('listing', kwargs={"listing_id":listing_id}))       
+
+    except:
+           return render(request, "auctions/error.html", {
+             "message": "Ups something went wrong with your bid, make sure that your bid is higher than the current one and the starting price" })
+         
+
+
+    
+def end_auction():
+    pass
