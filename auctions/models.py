@@ -66,8 +66,11 @@ class Bid(models.Model):
 
 
 class Comments(models.Model):
-    """
-
+    """Comments model contains all info about the comments:
+    * what listing
+    * what user made it
+    * when
+    * text of it
     """
 
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)

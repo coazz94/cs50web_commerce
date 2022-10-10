@@ -54,7 +54,7 @@
                     {% endif %}
                     </div>
                 {% endif %}
-                
+            
                 {% if listing.winner %}
                     <div class="fs-5 mb-5">
                         <h5 style="margin-top:20px; margin-bottom:20px">This auction has finished</h5>
@@ -64,8 +64,9 @@
                 
             </div>
         </div>
-    </div>
+      </div>
     </section>
+
     <section class="py-5">
         <div class="container my-5 py-5">
           <div class="row d-flex justify-content-center">
@@ -88,14 +89,7 @@
                   </p>
                   </div>
                 {% endfor %}
-
-
-
-
-
-
-
-
+                
                 <form action="{% url 'comment' %}" method="post">
                   {% csrf_token %}
                   	<div class="card-footer py-3 border-0" style="background-color: #f8f9fa;">
@@ -109,14 +103,12 @@
                   	  <div class="float-end mt-2 pt-1">
                   	    <button type="submit" id="add_comment" name ="add_comment" value="{{ listing.id }}" class="btn btn-primary btn-sm">Post comment</button>
                   	  </div>
-                  </form>
-
-                  
+                  </form>           
                 </div>
-              </div>
-              
+              </div>     
             </div>
           </div>
         </div>
     </section>
+
 {% endblock %}

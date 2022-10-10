@@ -91,54 +91,53 @@ def listing(request, listing_id):
         except:
             return an error Page
     """
+    try:
 
-    # get the item and the watchlist of the user
-    item = Listing.objects.get(id=listing_id)
-    watchlist = Watchlist.objects.filter(user=request.user.id)
-    on_watchlist = False
+        # get the item and the watchlist of the user
+        item = Listing.objects.get(id=listing_id)
+        watchlist = Watchlist.objects.filter(user=request.user.id)
+        on_watchlist = False
 
-    # get the bid count and highest_bid of the listing
-    bid_count =  Bid.objects.filter(listing=listing_id).count()
-    highest_bid = Bid.objects.filter(listing=listing_id).order_by("-bid_price").first()
+        # get the bid count and highest_bid of the listing
+        bid_count =  Bid.objects.filter(listing=listing_id).count()
+        highest_bid = Bid.objects.filter(listing=listing_id).order_by("-bid_price").first()
 
-    # check if the item is already on the watchlist
-    for items in watchlist:
-        if item.title == items.listing.title:
-            on_watchlist = True
-
-
-    # check if the user has created the listing (to gain acces to end_auction)
-    if item.created_by.username == request.user.username:
-        creator = True
-    else:
-        creator = False
-
-    # get all the comments for the listing
-    comments = Comments.objects.filter(listing=listing_id)
-
-    print(comments)
-
-    # render the Page with the infos
-    return render(request, "auctions/listing.html", {
-        "listing": item,
-        "watchlist" : on_watchlist, 
-        "bid_count" : bid_count, 
-        "highest_bid" : highest_bid,
-        "creator" : creator,
-        "comments" : comments
-    })
+        # check if the item is already on the watchlist
+        for items in watchlist:
+            if item.title == items.listing.title:
+                on_watchlist = True
 
 
-    #else:
-    #    return render(request, "auctions/error.html", {
-    #        "message": "This item dosent exist"
-    #    })
+        # check if the user has created the listing (to gain acces to end_auction)
+        if item.created_by.username == request.user.username:
+            creator = True
+        else:
+            creator = False
+
+        # get all the comments for the listing
+        comments = Comments.objects.filter(listing=listing_id)
+
+        # render the Page with the infos
+        return render(request, "auctions/listing.html", {
+            "listing": item,
+            "watchlist" : on_watchlist, 
+            "bid_count" : bid_count, 
+            "highest_bid" : highest_bid,
+            "creator" : creator,
+            "comments" : comments
+        })
+
+
+    except:
+        return render(request, "auctions/error.html", {
+            "message": "This item dosent exist"
+        })
         
 
 @login_required
 def watchlist(request):
     """
-        1. Render a Watchlistpage that shows the Users watchlist
+       Render a Watchlistpage that shows the Users watchlist
     """
 
     watchlist = Watchlist.objects.filter(user=request.user.id)
@@ -152,7 +151,7 @@ def watchlist(request):
 def create_listing(request):
     """
         If Post, get the data from the form and put it in the DB via the Model Listing
-        IF error with data return Error Page
+        If error with data return Error Page
     """
 
     if request.method == "POST":
@@ -295,14 +294,20 @@ def end_auction(request):
     
 
 def comment(request):
-    
+    """
+        comment on the listing that was provides by the Post.get function
+        make a new comment and save it, return to the same item 
+    """
 
+    # get the comment and listing.id
     comment = request.POST.get("comment")
     listing_id = request.POST.get("add_comment")
 
+    # get the listing and the user from their ids
     listing = Listing.objects.get(id = listing_id)
     user = User.objects.get(id = request.user.id)
 
+    # make a new instance of the comment model and sav it
     new_com = Comments(listing=listing, user=user, comment = comment)
     new_com.save()
 
@@ -311,7 +316,10 @@ def comment(request):
 
 
 def categories(request):
-
+    """
+        if mehtod == GET than return the view Page of the categoires
+        if POST than get the category from the Post.get, and render the index page with a filter 
+    """
     
     if request.method == "POST":
         
