@@ -91,41 +91,47 @@ def listing(request, listing_id):
             return an error Page
     """
 
-    try:
-        # get the item and the watchlist of the user
-        item = Listing.objects.get(id=listing_id)
-        watchlist = Watchlist.objects.filter(user=request.user.id)
+    # get the item and the watchlist of the user
+    item = Listing.objects.get(id=listing_id)
+    watchlist = Watchlist.objects.filter(user=request.user.id)
+    on_watchlist = False
 
-        # get the bid count and highest_bid of the listing
-        bid_count =  Bid.objects.filter(listing=listing_id).count()
-        highest_bid = Bid.objects.filter(listing=listing_id).order_by("-bid_price").first()
+    # get the bid count and highest_bid of the listing
+    bid_count =  Bid.objects.filter(listing=listing_id).count()
+    highest_bid = Bid.objects.filter(listing=listing_id).order_by("-bid_price").first()
 
-        # check if the item is already on the watchlist
-        for items in watchlist:
-            if item.title == items.listing.title:
-                on_watchlist = True
-            else:
-                on_watchlist = False
+    # check if the item is already on the watchlist
+    for items in watchlist:
+        if item.title == items.listing.title:
+            on_watchlist = True
 
-        # check if the user has created the listing (to gain acces to end_auction)
-        if item.created_by.username == request.user.username:
-            creator = True
-        else:
-            creator = False
 
-        # render the Page with the infos
-        return render(request, "auctions/listing.html", {
-            "listing": item,
-            "watchlist" : on_watchlist, 
-            "bid_count" : bid_count, 
-            "highest_bid" : highest_bid,
-            "creator" : creator,
-        })
+    # check if the user has created the listing (to gain acces to end_auction)
+    if item.created_by.username == request.user.username:
+        creator = True
+    else:
+        creator = False
 
-    except:
-        return render(request, "auctions/error.html", {
-            "message": "This item dosent exist"
-        })
+    # get all the comments for the listing
+    comments = Comments.objects.filter(listing=listing_id)
+
+    print(comments)
+
+    # render the Page with the infos
+    return render(request, "auctions/listing.html", {
+        "listing": item,
+        "watchlist" : on_watchlist, 
+        "bid_count" : bid_count, 
+        "highest_bid" : highest_bid,
+        "creator" : creator,
+        "comments" : comments
+    })
+
+
+    #else:
+    #    return render(request, "auctions/error.html", {
+    #        "message": "This item dosent exist"
+    #    })
         
 
 @login_required
@@ -287,3 +293,30 @@ def end_auction(request):
     return HttpResponseRedirect(reverse('listing', kwargs={"listing_id":listing_id}))
     
 
+def comment(request):
+    
+
+    comment = request.POST.get("comment")
+    listing_id = request.POST.get("add_comment")
+
+    listing = Listing.objects.get(id = listing_id)
+    user = User.objects.get(id = request.user.id)
+
+    new_com = Comments(listing=listing, user=user, comment = comment)
+    new_com.save()
+
+
+    return HttpResponseRedirect(reverse("listing", kwargs={"listing_id" : listing_id}))
+
+
+def categories(request):
+
+
+    print(forms.CATEGORIES)
+    
+    if request.method == "POST":
+        pass
+    else:
+        return render(request, "auctions/categories.html", {
+            "categories" : forms.CATEGORIES
+        })
