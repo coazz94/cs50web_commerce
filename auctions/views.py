@@ -20,6 +20,7 @@ def index(request):
     """
         Just the index page that is showing or the listings aviable
     """
+
     return render(request, "auctions/index.html", {
         "listings": Listing.objects.filter()
     })
@@ -311,11 +312,15 @@ def comment(request):
 
 def categories(request):
 
-
-    print(forms.CATEGORIES)
     
     if request.method == "POST":
-        pass
+        
+        category = request.POST.get("category")
+
+        return render(request, "auctions/index.html", {
+            "listings": Listing.objects.filter(category=category)
+        })
+
     else:
         return render(request, "auctions/categories.html", {
             "categories" : forms.CATEGORIES

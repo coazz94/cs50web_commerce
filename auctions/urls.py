@@ -17,5 +17,5 @@ urlpatterns = [
     path("make_bid", views.make_bid, name="make_bid"),
     path("end_auction", views.end_auction, name="end_auction"),
     path("comment", views.comment, name="comment"),
-    path("categories", views.categories, name="categories"),
+    path(r"categories/", views.categories, name="categories"),
 ]

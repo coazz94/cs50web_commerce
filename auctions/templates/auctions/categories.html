@@ -8,9 +8,11 @@
     <h3>Categories</h3>
     <ul>
         {% for shortcode, category in categories %}
-            <li>
-                <a href=""> {{ category }} </a>
-            </li>
+        <form action="{% url 'categories' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" name="category" value="{{ shortcode }}" class="btn-link">{{ category }}</button>
+        </form>
+
         {% endfor %}
     </ul>
 
