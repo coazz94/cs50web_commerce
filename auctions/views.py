@@ -107,7 +107,6 @@ def listing(request, listing_id):
             if item.title == items.listing.title:
                 on_watchlist = True
 
-
         # check if the user has created the listing (to gain acces to end_auction)
         if item.created_by.username == request.user.username:
             creator = True
@@ -162,14 +161,15 @@ def create_listing(request):
         # if the data is valid than proceed
         if form_data.is_valid():
 
+            #img = form_data.cleaned_data["image"] // manual Image Upload deactivated
             title = form_data.cleaned_data["title"]
             description = form_data.cleaned_data["description"]
             price = form_data.cleaned_data["price"]
-            img = form_data.cleaned_data["image"]
             category = form_data.cleaned_data["category"]
-
+            img_url = form_data.cleaned_data["img_url"]
+            
             # make a new Listing object, with the parameters from above
-            listing = Listing(title=title, description=description, price=price, image=img, category=category, active=True, created_by=User.objects.get(id=request.user.id))
+            listing = Listing(title=title, description=description, price=price, image_url=img_url, category=category, active=True, created_by=User.objects.get(id=request.user.id))
             listing.save()
 
             # return to the index Page
@@ -232,7 +232,7 @@ def make_bid(request):
         we have to check some dependecies and than be able to save the bid
     """
     
-    if request.POST["bid_price"] and request.POST.get("make_bid"):
+    try: 
 
         # get the bid price provided and the listing
         bid_price= float(request.POST["bid_price"])
@@ -248,8 +248,9 @@ def make_bid(request):
         else:
             highest_bid = highest_bid.bid_price   
 
+
         # if the bid price is bigger than the startingprice/ highest bid 
-        if bid_price > highest_bid or bid_price > starting_price:
+        if bid_price > highest_bid and bid_price > starting_price:
 
             # save the bid
             listing = Listing.objects.get(id = listing_id)
@@ -261,15 +262,14 @@ def make_bid(request):
             return render(request, "auctions/error.html", {
                 "message": "Ups something went wrong with your bid, make sure that your bid is higher than the current one and the starting price" })
 
-
         # return the listing Page
         return HttpResponseRedirect(reverse('listing', kwargs={"listing_id":listing_id}))       
 
-    else:
+    except:
 
         # if something went wrong with the post arguments return a error Page
         return render(request, "auctions/error.html", {
-          "message": "Ups something went wrong with your bid, make sure that your bid is higher than the current one and the starting price" })
+          "message": "Ups something went wrong with your bid, make sure that your bid is higher than the current one and the starting price, dont use comma only dot(example: 5.55)" })
 
 
 @login_required 
@@ -292,7 +292,7 @@ def end_auction(request):
     # refresh the listing page
     return HttpResponseRedirect(reverse('listing', kwargs={"listing_id":listing_id}))
     
-
+@login_required 
 def comment(request):
     """
         comment on the listing that was provides by the Post.get function

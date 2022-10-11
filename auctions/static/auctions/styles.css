@@ -5,10 +5,7 @@ body {
 
 #catbutton {
    color:red;
-   font-size: large;
+   font-size:x-large;
+   font-weight: 600;
 }
 
-
-#test {
-    color:red;
-}
