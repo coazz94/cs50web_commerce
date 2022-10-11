@@ -30,6 +30,7 @@ class Listing(models.Model):
     active = models.BooleanField(default=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created")
     winner = models.ForeignKey( User, null = True, blank=True, on_delete=models.CASCADE, related_name="winner")
+    highest_bid = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     image_url = models.URLField(null=True, blank=True)
 
     def __str__(self):

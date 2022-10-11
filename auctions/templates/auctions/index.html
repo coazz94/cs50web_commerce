@@ -18,6 +18,13 @@
                     <div class="card-body">
                         <p class="card-text">{{ listing.description }}</p>
                     </div>
+                    <div class="card-bottom ml-3" >
+                        {% if listing.highest_bid == 0 %}
+                            <p class="card-text">Current Price: {{ listing.price }}</p>
+                        {% else %}
+                            <p class="card-text">Current Price: {{ listing.highest_bid }}</p>
+                        {% endif %}
+                    </div>
             </div>
         </div>
         {% endfor %}

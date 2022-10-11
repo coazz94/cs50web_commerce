@@ -231,8 +231,7 @@ def make_bid(request):
         a function to make the bid for the item
         we have to check some dependecies and than be able to save the bid
     """
-    
-    try: 
+    try:
 
         # get the bid price provided and the listing
         bid_price= float(request.POST["bid_price"])
@@ -240,7 +239,7 @@ def make_bid(request):
 
         # get the starting price and the highest bid ever
         starting_price = float(Listing.objects.get(id = listing_id).price)      
-        highest_bid = Bid.objects.filter(listing=listing_id).order_by("-bid_price").first()     
+        highest_bid = Bid.objects.filter(listing=listing_id).order_by("-bid_price").first()    
 
         # check if a bid was ever made, when not than ste the price to 0 else set it to the higest bid price ever made
         if not highest_bid:
@@ -248,9 +247,12 @@ def make_bid(request):
         else:
             highest_bid = highest_bid.bid_price   
 
-
         # if the bid price is bigger than the startingprice/ highest bid 
         if bid_price > highest_bid and bid_price > starting_price:
+
+            #Update the highest bid value
+            listing = Listing.objects.filter(id = listing_id)
+            listing.update(highest_bid=bid_price)
 
             # save the bid
             listing = Listing.objects.get(id = listing_id)
