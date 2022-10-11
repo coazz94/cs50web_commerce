@@ -22,7 +22,7 @@ def index(request):
     """
 
     return render(request, "auctions/index.html", {
-        "listings": Listing.objects.filter()
+        "listings": Listing.objects.filter(active=True)
     })
 
 

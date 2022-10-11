@@ -71,8 +71,8 @@
         <div class="container my-5 py-5">
           <div class="row d-flex justify-content-center">
             <div class="col-md-12 col-lg-10 col-xl-8">
+              <h4 style="margin-left: 300px;">Comments</h4>
               <div class="card">
-
                 <!--For loop for comments-->
                 {% for comment in comments %}
                   <div class="card-body">
@@ -89,8 +89,8 @@
                   </p>
                   </div>
                 {% endfor %}
-                
-                <form action="{% url 'comment' %}" method="post">
+                {% if request.user.is_authenticated %}
+                  <form action="{% url 'comment' %}" method="post">
                   {% csrf_token %}
                   	<div class="card-footer py-3 border-0" style="background-color: #f8f9fa;">
                   	  <div class="d-flex flex-start w-100">
@@ -103,7 +103,8 @@
                   	  <div class="float-end mt-2 pt-1">
                   	    <button type="submit" id="add_comment" name ="add_comment" value="{{ listing.id }}" class="btn btn-primary btn-sm">Post comment</button>
                   	  </div>
-                  </form>           
+                    </form>       
+                {% endif %}    
                 </div>
               </div>     
             </div>
