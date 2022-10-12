@@ -25,7 +25,7 @@ class CreateListing(forms.Form):
 
     #image = forms.ImageField(label="Image", required=False)
 
-    img_url = forms.URLField(label="URL", required=False)
+    img_url = forms.URLField(label="Image Url:", required=False)
 
     category = forms.ChoiceField(label="Category", required=True, choices=CATEGORIES)
 
